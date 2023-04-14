@@ -1,7 +1,6 @@
 CCPPC:=gcc
 CCPP:=g++
 
-
 CXXFLAGSC = $(shell pkg-config --cflags libcbor)
 LDFLAGSC = $(shell pkg-config --libs libcbor)
 

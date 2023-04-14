@@ -1,0 +1,19 @@
+<svg width="100" height="100">
+    <g id="sol">
+        <rect x="0" y="80" width="100" height="20" fill="green"/>
+    </g>
+    <g id="ciel">
+        <rect x="0" y="0" width="100" height="80" fill="blue"/>
+        <g id="soleil">
+            <circle cx="30" cy="5" r="20" stroke="yellow"  style="fill:orange;stroke-width:5" opacity="1">
+                <driven target="cx" by="max(sun_x,sun_y)" type="float"/>
+                <driven target="cy" by="min(sun_x,sun_y)" type="float"/>
+                <driven target="stroke-width" by="abs(cstroke)" type="int"/>
+            </circle>
+        </g>
+    </g>
+    <g id="maison">
+        <rect x="60" y="65" width="30" height="23" fill="gray"/>
+        <polyline points="60 65 75 55 90 65" stroke="black" fill="red" stroke-width="1"/>
+    </g>
+</svg>

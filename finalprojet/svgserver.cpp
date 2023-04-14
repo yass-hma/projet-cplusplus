@@ -1,5 +1,6 @@
 #include "func.h"
 
+
 using namespace tinyxml2;
 using namespace std;
 
@@ -35,17 +36,10 @@ int main(int argc, char *argv[])
 {
 	if (argc != 2){
 		perror("il y a une erreur dans les args");
-    exit(1);
-   }else if (argc == 2){
-   	std::ifstream infile((char *)argv[1]);
-		if (!infile.good()) {
-			perror("L'image n'existe pas.");
-			exit(2);
-		}
-		else
-     file = argv[1];
-   }
-   
+    	exit(1);
+    }
+    else
+      file = argv[1];
   
   gtk_init(&argc, &argv);	
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);

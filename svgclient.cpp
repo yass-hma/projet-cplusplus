@@ -58,11 +58,11 @@ int main(int argc, char const *argv[]) {
     while (iter < 1) {
         iter++;
         std::this_thread::sleep_for(delay);
-        cbor_item_t *cbor_root = cbor_new_definite_map(3);
+        cbor_item_t *cbor_root = cbor_new_definite_map(5);
         time += 50;
         val = sin(2 * pi * time / period);
         cbor_map_add(cbor_root, (struct cbor_pair) {
-	    .key = cbor_move(cbor_build_string("sun")),
+	    .key = cbor_move(cbor_build_string("fill_style")),
 	    .value = cbor_move(cbor_build_bytestring(hex_value, sizeof(hex_value)))
 	});
        /*cbor_map_add(cbor_root, (struct cbor_pair) {
@@ -74,12 +74,20 @@ int main(int argc, char const *argv[]) {
                 .value = cbor_move(cbor_build_float8(val+1))
         });*/
         cbor_map_add(cbor_root, (struct cbor_pair) {
-                .key = cbor_move(cbor_build_string("sun_y")),
-                .value = cbor_move(cbor_build_float8(10))
+                .key = cbor_move(cbor_build_string("sun_x")),
+                .value = cbor_move(cbor_build_float8(0))
+        });
+         cbor_map_add(cbor_root, (struct cbor_pair) {
+                .key = cbor_move(cbor_build_string("eyes_x")),
+                .value = cbor_move(cbor_build_float8(-5))
+        });
+         cbor_map_add(cbor_root, (struct cbor_pair) {
+                .key = cbor_move(cbor_build_string("eyes_y")),
+                .value = cbor_move(cbor_build_float8(5))
         });
         cbor_map_add(cbor_root, (struct cbor_pair) {
-                .key = cbor_move(cbor_build_string("sun_x")),
-                .value = cbor_move(cbor_build_float8(15))
+                .key = cbor_move(cbor_build_string("je_rougis")),
+                .value = cbor_move(cbor_build_string("lk"))
         });
         
         size_t buffer_size,

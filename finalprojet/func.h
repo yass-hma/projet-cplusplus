@@ -15,8 +15,6 @@
 #include <netdb.h>
 #include <cbor.h>
 #include <iostream>
-#include <fstream>
-#include <filesystem>
 #include <stdio.h>
 #include <stack>
 #include <vector>
@@ -45,24 +43,19 @@ extern RsvgRectangle viewport;
 template<typename T> T evaluer_comp_fon(const std::string& expression, cbor_item_t* map);
 template<typename T> T evaluate_expression_cbor(const std::string& expression, cbor_item_t* map);
 template<typename T> T evaluer_geo_fon(const std::string& expression, cbor_item_t* map);
-
-size_t ft_serach_cle(cbor_item_t *,std::string );
-
-std::string evaluer_style(std::string , std::string );
-
-void* update_element_verification(tinyxml2::XMLElement* ,const char *,const char *, const char *, cbor_item_t* );
-void getdriven(tinyxml2::XMLElement* , cbor_item_t* );
-
-bool checkAttributeValue(std::string , std::string );
-bool checkAttributein(std::string );
-bool isinstyle(std::string , std::string );
-bool isgeofunction(std::string );
-bool iscompfunction(std::string );
-bool isarethfunction(std::string );
-bool islengthfunction(std::string );
-
-void animate_element_attribute_change(tinyxml2::XMLElement* , const char* , float , float , int ); 
-int evaluer_longueur(const std::string& , cbor_item_t* );
+size_t ft_serach_cle(cbor_item_t *cbor_root,std::string by);
+std::string evaluer_style(std::string style, std::string param);
+void* update_element_verification(tinyxml2::XMLElement* parent,const char *target,const char *targetType, const char *by, cbor_item_t* cbor_root);
+void getdriven(tinyxml2::XMLElement* parent, cbor_item_t* cbor_root);
+bool checkAttributeValue(std::string attribute, std::string value);
+bool checkAttributein(std::string attribute);
+bool isinstyle(std::string stl, std::string att);
+bool isgeofunction(std::string func);
+bool iscompfunction(std::string func);
+bool isarethfunction(std::string func);
+bool islengthfunction(std::string func);
+void animate_element_attribute_change(tinyxml2::XMLElement* parent, const char* target, float start_value, float end_value, int duration_ms); 
+int evaluer_longueur(const std::string& expression, cbor_item_t* map);
 void reload_svg();
 void *udp_listener(void* );
 

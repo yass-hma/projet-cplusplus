@@ -27,6 +27,13 @@ int main(int argc, char const *argv[]) {
         perror("socket creation failed");
         exit(EXIT_FAILURE);
     }
+    
+   /* cbor_map_add(cbor_root, (struct cbor_pair) {
+    .key = cbor_move(cbor_build_string("hex_value")),
+    .value = cbor_move(cbor_build_bytestring(hex_value, sizeof(hex_value)))
+});*/
+    
+    
 
     struct addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -46,16 +53,35 @@ int main(int argc, char const *argv[]) {
     double time = 0;
     unsigned char *buffer;
     int iter = 0;
-    while (iter < 10) {
+    uint8_t hex_value[] = {0x00, 0x80, 0x00};
+    size_t x = sizeof(hex_value);
+    while (iter < 1) {
         iter++;
         std::this_thread::sleep_for(delay);
-        cbor_item_t *cbor_root = cbor_new_definite_map(1);
+        cbor_item_t *cbor_root = cbor_new_definite_map(3);
         time += 50;
         val = sin(2 * pi * time / period);
-        cbor_p_add(cbor_root, (struct cbor_pair) {
-                .key = cbor_move(cbor_build_string("sun_x")),
-                .value = cbor_move(cbor_build_float8(val))
+        cbor_map_add(cbor_root, (struct cbor_pair) {
+	    .key = cbor_move(cbor_build_string("sun")),
+	    .value = cbor_move(cbor_build_bytestring(hex_value, sizeof(hex_value)))
+	});
+       /*cbor_map_add(cbor_root, (struct cbor_pair) {
+                .key = cbor_move(cbor_build_string("sun_y")),
+                .value = cbor_move(cbor_build_float8(val+2))
         });
+        cbor_map_add(cbor_root, (struct cbor_pair) {
+                .key = cbor_move(cbor_build_string("sun")),
+                .value = cbor_move(cbor_build_float8(val+1))
+        });*/
+        cbor_map_add(cbor_root, (struct cbor_pair) {
+                .key = cbor_move(cbor_build_string("sun_y")),
+                .value = cbor_move(cbor_build_float8(10))
+        });
+        cbor_map_add(cbor_root, (struct cbor_pair) {
+                .key = cbor_move(cbor_build_string("sun_x")),
+                .value = cbor_move(cbor_build_float8(15))
+        });
+        
         size_t buffer_size,
                 length = cbor_serialize_alloc(cbor_root, &buffer, &buffer_size);
         sendto(socket_fd, buffer, length, 0, server->ai_addr, server->ai_addrlen);
@@ -64,4 +90,3 @@ int main(int argc, char const *argv[]) {
     }
     free(server);
 }
-

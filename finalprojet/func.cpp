@@ -9,7 +9,7 @@ bool att = true;
 
 void reload_svg() {
   XMLPrinter printer;
-  svg_data.SaveFile(file);
+  //svg_data.SaveFile(file);
   svg_data.Print(&printer);
   rsvg_handle_close(svg_handle, NULL);
   svg_handle = rsvg_handle_new_from_data ((const unsigned char*) printer.CStr(), printer.CStrSize(), NULL);
@@ -89,8 +89,8 @@ T evaluer_comp_fon(const std::string& expression, cbor_item_t* map) {
                 error = true;
                 return -1;
             }
-            if (index == -1) {
-                cout << "Clé : " << (std::string)s << "introuvable dans la map CBOR" <<endl ;
+            if (pair.key == nullptr) {
+                cout << "Clé introuvable dans la map CBOR" <<endl ;
                 error = true;
                 return -1;
             }
@@ -180,7 +180,7 @@ T evaluate_expression_cbor(const std::string& expression, cbor_item_t* map) {
             // récupérer la valeur de la clé dans la map CBOR
             size_t index = ft_serach_cle(map,(std::string)key);
             if (index == -1) {
-                cout << "Clé : " << (std::string)key << " introuvable dans la map CBOR" <<endl ;
+                cout << "Clé introuvable dans la map CBOR" <<endl ;
                 error = true;
                 return -1;
             }
@@ -301,14 +301,14 @@ while (!operators.empty() && (operators.top() == '+' || operators.top() == '-' |
         result = x * y;
     } else if (op == '/') {
         if (y == 0) {
-            cout << "Erreur divise par zéro"<< endl;
+            cout << "Divise par zéro"<< endl;
             error = true;
             return -1;
         }
         result = x / y;
     } else if (op == '%') {
         if (y == 0) {
-            cout << "Erreur modulo par zéro"<< endl;
+            cout << "Modulo par zéro"<< endl;
             error = true;
             return -1;
         }
@@ -352,7 +352,7 @@ T evaluer_geo_fon(const std::string& expression, cbor_item_t* map) {
             cbor_pair pair= cbor_map_handle(map)[index];
             cbor_item_t* value = pair.value;
             if (index == -1) {
-		        cout << "Clé :" <<(std::string)key << " introuvable dans la map CBOR "<< endl;
+		        cout << "Clé introuvable dans la map CBOR "<< endl;
 		        error = true;
 		        return -1;
             }
@@ -517,15 +517,13 @@ int evaluer_longueur(const std::string& expression, cbor_item_t* map){
 	size_t index = ft_serach_cle(map,(std::string)key);
             cbor_pair pair= cbor_map_handle(map)[index];
             cbor_item_t* value = pair.value;
-            if (index == -1) {
-                cout << "Clé : " <<(std::string)key << " introuvable dans la map CBOR ";
-                return -1;
+            if (pair.key == nullptr) {
+                throw std::invalid_argument("Clé introuvable dans la map CBOR");
             }
-            if (!cbor_isa_string(pair.value)) {
-            	cout << "valeur de la Clé : " << std::string((char*)cbor_string_handle(pair.key), cbor_string_length(pair.key)) << " n'est pas string" ;
-            	return -1;
-             }
-   return  cbor_string_length(value);
+            if (!cbor_isa_string(pair.key)) {
+            	throw std::invalid_argument("valeur de la Clé n'est pas string");
+                }
+               return  cbor_string_length(value);
 }
 
 bool isinstyle(std::string stl, std::string att){
@@ -579,11 +577,11 @@ void* update_element_verification(XMLElement* parent,const char *target, const c
 			else{
 				error = true;
 				cout << "WARNING : "<< target <<" accept unique values" << endl;
-				res = (void *)"err"; 
+				res = (void *)"err";
 			}
 			}else{
 				error = true;
-				cout << "WARNING : "<< target <<" and valeu of by haven't the same type " << endl;
+				cout << "WARNING : "<< target <<" and by haven't the same type " << endl;
 				res = (void *)"err";
 			}
       	}else if(iscompfunction(by)){
@@ -615,7 +613,7 @@ void* update_element_verification(XMLElement* parent,const char *target, const c
 			}
 		}else{
 			error = true;
-			cout << "WARNING : "<< target <<" and value of by haven't the same type " << endl;
+			cout << "WARNING : "<< target <<" and by haven't the same type " << endl;
 			res = (void *)"err";
 		}
       	}else if(isgeofunction(by)){
@@ -641,93 +639,93 @@ void* update_element_verification(XMLElement* parent,const char *target, const c
                     }
 		}else{
 			error = true;
-			cout << "WARNING : "<< target <<" and value of by haven't the same type " << endl;
+			cout << "WARNING : "<< target <<" and by haven't the same type " << endl;
 			res = (void *)"err";
 		}
       	}else if(islengthfunction(by)){
       		int r = evaluer_longueur(by,cbor_root);
-      		if (r == -1){
-      			error = true;
-      			cout << ":" << by << endl; 
-      			res = (void *)"err";
-      			return res;
-      		}
+      		std::cout << r <<std::endl;
       		res = &r;
       	}else{
       		size_t index = ft_serach_cle(cbor_root,(std::string)by);
       		if (index != -1){
       			test = true;
       			cbor_pair pair= cbor_map_handle(cbor_root)[index];
-            cbor_item_t* value = pair.value;
+               		cbor_item_t* value = pair.value;
       			switch (cbor_typeof(value)) {
 		        	case CBOR_TYPE_UINT:
 		        	    if(strcmp(targetType,"int") == 0){
 		        	    	int result = cbor_get_int(value);
 		        	  		if((checkAttributein(target) && checkAttributeValue(target,std::to_string(result))) || (!checkAttributein(target)))
-											res = &result;
+							res = &result;
 			    	    		else{
-											error = true;
-											cout << "WARNING : "<< target <<" accept unique values" << endl;
-											res = (void *)"err";
-										}
-		            	 }else{
-										error = true;
-										cout << "WARNING : "<< target <<" and value of by haven't the same type " << endl;
-										res = (void *)"err";
-									}
-		            	break;
+							error = true;
+							cout << "WARNING : "<< target <<" accept unique values" << endl;
+							res = (void *)"err";
+						}
+		            	     }else{
+						error = true;
+						cout << "WARNING : "<< target <<" and by haven't the same type " << endl;
+						res = (void *)"err";
+					}
+		            		break;
 		        	 case CBOR_TYPE_FLOAT_CTRL:
-				    		if(strcmp(targetType,"float") == 0){
-				    			float result = 	cbor_float_get_float(value);		    			
-			    				if((checkAttributein(target) && checkAttributeValue(target,std::to_string(result))) || (!checkAttributein(target)))
-										res = &result;
-									else{
-										error = true;
-										cout << "WARNING : "<< target <<" accept unique values" << endl;
-										res = (void *)"err";
-									}    
-								}else{
-									error = true;
-									cout << "WARNING : "<< target <<" and value of by haven't the same type " << endl;
-									res = (void *)"err";
-								}
-		           	break;
+				    	if(strcmp(targetType,"float") == 0){
+				    			
+			    			float result = 	cbor_float_get_float(value);
+			    			
+			    			if((checkAttributein(target) && checkAttributeValue(target,std::to_string(result))) || (!checkAttributein(target)))
+							res = &result;
+							
+						else{
+							error = true;
+							cout << "WARNING : "<< target <<" accept unique values" << endl;
+							res = (void *)"err";
+							}     
+				    	}else{
+						error = true;
+						cout << "WARNING : "<< target <<" and by haven't the same type " << endl;
+						res = (void *)"err";
+							}
+		           		break;
 		        	case CBOR_TYPE_STRING:
 		           		if(strcmp(targetType,"string") == 0){	
-										std::string* v = new std::string(std::string((char*)cbor_string_handle(value), cbor_string_length(value)));
-										res = v;
-		            	}else{
+			  			std::string* v = new std::string(std::string((char*)cbor_string_handle(value), cbor_string_length(value)));
+			  			res = v;
+		            		}else{
 		            			error = true ;
-											cout << "WARNING : "<< target <<" and value of by haven't the same type " << endl;
-		         					res = (void* )"err";
-		            	}
+						cout << "WARNING : "<< target <<" and by haven't the same type " << endl;
+		         			res = (void* )"err";
+		            		}
 		            		break;
 		            	case CBOR_TYPE_BYTESTRING:
 		           		if(strcmp(targetType,"color") == 0){
-										uint8_t *hex_value = cbor_bytestring_handle(value);
-										size_t hex_value_size = cbor_bytestring_length(value);
-					    			char hex_string[hex_value_size*2 +1];
-					    			sprintf(hex_string, "#");
-										for (int i = 0; i < hex_value_size; i++) {
-											sprintf(hex_string + i*2 + 1, "%02x", hex_value[i]);
-										}						    
-										std::string* v = new std::string(std::string((char*)hex_string, sizeof(hex_string)));
-										res = v;
-		            	}else{
-										error = true;
-										std::cout << "error target" << target << endl;
-		            	}
-		            	break;
+						uint8_t *hex_value = cbor_bytestring_handle(value);
+						size_t hex_value_size = cbor_bytestring_length(value);
+					    	char hex_string[hex_value_size*2 +1];
+					    	sprintf(hex_string, "#");
+						for (int i = 0; i < hex_value_size; i++) {
+							sprintf(hex_string + i*2 + 1, "%02x", hex_value[i]);
+						}						    
+					  	std::string* v = new std::string(std::string((char*)hex_string, sizeof(hex_string)));
+					  	res = v;
+		            		}else{
+				    		error = true;
+				    		std::cout << "error target" << target << endl;
+		            		}
+		            		break;
 		        	default:
-							error = true ;
+					error = true ;
 			    		cout << "WARNING : Type de valeur non reconnu dans la map CBOR" << endl;
-			 				res = (void* )"err";
-		          break;
+			 		res = (void* )"err";
+		            		break;
 		    	}
 		    }else{
+		    	test = false;
 		    	error = true ;
-		    	res = (void *)"err";
-		    	cout << "by : " << by << " ,n'existe pas dans la map CBOOR" << endl;
+		    	res = (void* )"err";
+		    	cout << "by : " << by << " , n'existe pas dans la map CBOOR" << endl;
+		    	cout << (char*)res << endl;
 		    }
 		  }
      return res; 	
@@ -735,20 +733,47 @@ void* update_element_verification(XMLElement* parent,const char *target, const c
 
 void animate_element_attribute_change(XMLElement* parent, const char* target, float start_value, float end_value, int duration_ms) {
 
-    const int steps = 5;  
-		const float delay_factor = 1.0f / steps;  
+	 const int steps = 5;
+    const float delay_factor = 1.0f / steps;
 
-		float current_value = start_value;
-		float increment = (end_value - start_value) / steps;
+    float current_value = start_value;
+    float increment = (end_value - start_value) / steps;
+    int elapsed_time_ms = 0;
+    int step_duration_ms = duration_ms / steps;
 
-		for (int i = 0; i < steps; i++) {
+    auto start_time = std::chrono::steady_clock::now();
+    auto end_time = start_time + std::chrono::milliseconds(duration_ms);
+
+    while (std::chrono::steady_clock::now() < end_time) {
+        current_value += increment;
+        parent->SetAttribute(target, current_value);
+        reload_svg();
+        gtk_widget_queue_draw(darea);
+        std::this_thread::sleep_for(std::chrono::milliseconds(step_duration_ms));
+        elapsed_time_ms += step_duration_ms;
+    }
+
+    // Animation is finished, set the attribute to the final value
+    parent->SetAttribute(target, end_value);
+    reload_svg();
+    gtk_widget_queue_draw(darea);
+/*
+	const int steps =15;  
+	const float delay_factor = 1.0f / steps;  
+
+	float current_value = start_value;
+	float increment = (end_value - start_value) / steps;
+
+	for (int i = 0; i < steps; i++) {
 		current_value += increment;
+
 		parent->SetAttribute(target, current_value);
+
 		reload_svg();
 		gtk_widget_queue_draw(darea);
-		usleep(duration_ms*10);
+		usleep(duration_ms*100);
 	}
-	parent->SetAttribute(target, end_value);
+	parent->SetAttribute(target, end_value);*/
 }
 
 // Fonction récursive pour chercher l'élément driven et récupérer ses attributs et verifie le type de target et verifie si target est un attribut direct ou si e
@@ -768,13 +793,14 @@ void getdriven(XMLElement* parent, cbor_item_t *cbor_root){
       if (verifie_target){
       		update_element_verification(parent,target,targetType,by,cbor_root);
       if(error){
-    	error = false;
+    		error = false;
       }else{
       	if(strcmp(targetType,"float") == 0){
       			float res = parent->FloatAttribute(target);
 		  	if (test){
 			  	float resultat_anlyze = *((float*)update_element_verification(parent,target,targetType,by,cbor_root));
-		      animate_element_attribute_change(parent,target, res, resultat_anlyze, delay);
+		      			animate_element_attribute_change(parent,target, res, resultat_anlyze, delay);
+		      		
 		  	}   
 	}else if(strcmp(targetType,"string") == 0){
 			if (test){
@@ -795,10 +821,6 @@ void getdriven(XMLElement* parent, cbor_item_t *cbor_root){
       	}
       }
      }else if (style && isinstyle(style,target)){
-				 	update_element_verification(parent,target,targetType,by,cbor_root);
-				  if(error){
-						error = false;
-				  }else{
       		std::string style_string = target;
       		if(strcmp(targetType,"float") == 0){
       	      		float resultat_anlyze = *((float*)update_element_verification(parent,target,targetType,by,cbor_root));
@@ -812,6 +834,7 @@ void getdriven(XMLElement* parent, cbor_item_t *cbor_root){
 	      	}else if(strcmp(targetType,"color") == 0){
 	      		std::string resultat_anlyze = *((std::string *)update_element_verification(parent,target,targetType,by,cbor_root));
 	      		style_string += ':'+resultat_anlyze;
+	      		std::cout << style_string << endl;
 	      	}
 	      	else{
 	      		int resultat_anlyze = *((int *)update_element_verification(parent,target,targetType,by,cbor_root));
@@ -820,11 +843,11 @@ void getdriven(XMLElement* parent, cbor_item_t *cbor_root){
 	      	}
       		std::string ch = evaluer_style(style, style_string);
 		parent->SetAttribute("style",ch.c_str());
-					}
+		
       	}
       	else{
       		cout << "target : " << target << " , n'existe pas !!!!" << endl;
- 				}
+ 	}
     }
     getdriven(child,cbor_root);  // Recherche récursive dans les enfants
     child = child->NextSiblingElement();
